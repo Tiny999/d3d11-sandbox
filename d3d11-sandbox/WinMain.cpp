@@ -1,23 +1,6 @@
 #include <Windows.h>
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-
-	switch (msg)
-	{
-	case WM_CLOSE:
-		PostQuitMessage(69);
-		break;
-	case WM_KEYDOWN:
-		if (wParam == 'F')
-		{
-			SetWindowText(hWnd, "NEW TITLE");
-		}
-	}
-
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
+#include "Window.h"
 
 int CALLBACK WinMain(
 	HINSTANCE	hInstance, 
@@ -26,36 +9,7 @@ int CALLBACK WinMain(
 	int			nCmdShow
 ) 
 {
-	const auto pClassName = "hw3d";
-
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_OWNDC;
-	wc.lpfnWndProc = WndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = nullptr;
-	wc.hCursor = nullptr;
-	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = pClassName;
-	wc.hIcon = nullptr;
-
-
-	// Register Window Class
-	RegisterClassEx(&wc);
-
-	// Create window
-	HWND hWnd = CreateWindowEx(
-		0, pClassName,
-		"Direct3D Sandbox",
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 640, 480,
-		nullptr, nullptr, hInstance, nullptr
-	);
-
-	// Show window
-	ShowWindow(hWnd, SW_SHOW);
+	Window wnd(800, 300, "Direct3d11 Sandbox");
 
 	// Message Pump
 	MSG msg;
