@@ -1,9 +1,23 @@
 #pragma once
 
 #include "Win.h"
+#include "Exception.h"
 
 class Window
 {
+public:
+	class WinException : public Exception
+	{
+	public:
+		WinException(int line, const char* file, HRESULT hr) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
+		static std::string TranslateErrorCode(HRESULT hr) noexcept;
+		HRESULT GetErrorCode() const noexcept;
+		std::string GetEroorString() const noexcept;
+	private:
+		HRESULT hr;
+	};
 private:
 	// Singleton to manange registration/cleanup of window class
 	class WindowClass
@@ -35,3 +49,6 @@ private:
 	HWND hWnd;
 };
 
+
+// Error exception helper macro
+#define WND_EXCEPT(hr) Window::WinException(__LINE__, __FILE__, hr)
