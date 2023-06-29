@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "Window.h"
+#include "Exception.h"
 
 int CALLBACK WinMain(
 	HINSTANCE	hInstance, 
@@ -9,22 +10,36 @@ int CALLBACK WinMain(
 	int			nCmdShow
 ) 
 {
-	Window wnd(800, 300, "Direct3d11 Sandbox");
+	try {
+		Window wnd(800, 300, "Direct3d11 Sandbox");
 
-	// Message Pump
-	MSG msg;
-	BOOL gResult;
+		// Message Pump
+		MSG msg;
+		BOOL gResult;
 
-	while ((gResult  =  GetMessage(&msg, nullptr, 0, 0))  > 0)
-	{
-		TranslateMessage(&msg);
-		DispatchMessageA(&msg);
+		while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
+		{
+			TranslateMessage(&msg);
+			DispatchMessageA(&msg);
+		}
+
+		if (gResult == -1)
+		{
+			return -1;
+		}
+
+		return msg.wParam;
 	}
-
-	if (gResult == -1)
+	catch (const Exception& e)
 	{
-		return -1;
+		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
 	}
-
-	return msg.wParam;
+	catch (const std::exception& e)
+	{
+		MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
+	catch (...)
+	{
+		MessageBoxA(nullptr, "No Available Information", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
 }
