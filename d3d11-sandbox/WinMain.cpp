@@ -21,6 +21,10 @@ int CALLBACK WinMain(
 		{
 			TranslateMessage(&msg);
 			DispatchMessageA(&msg);
+			if (wnd.kbd.KeyIsPressed(VK_SPACE))
+			{
+				MessageBox(nullptr, "Space was pressed", "OH YEAHHH", MB_ICONEXCLAMATION);
+			}
 		}
 
 		if (gResult == -1)
