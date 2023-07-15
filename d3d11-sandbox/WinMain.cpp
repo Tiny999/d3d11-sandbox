@@ -2,6 +2,8 @@
 
 #include "Window.h"
 #include "Exception.h"
+#include <sstream>
+#include <iostream>
 
 int CALLBACK WinMain(
 	HINSTANCE	hInstance, 
@@ -21,10 +23,6 @@ int CALLBACK WinMain(
 		{
 			TranslateMessage(&msg);
 			DispatchMessageA(&msg);
-			if (wnd.kbd.KeyIsPressed(VK_SPACE))
-			{
-				MessageBox(nullptr, "Space was pressed", "OH YEAHHH", MB_ICONEXCLAMATION);
-			}
 		}
 
 		if (gResult == -1)

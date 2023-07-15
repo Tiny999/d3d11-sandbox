@@ -17,7 +17,9 @@ public:
 			WheelUp,
 			WheelDown, 
 			Move,
-			Invalid
+			Enter,
+			Leave,
+			Invalid,
 		};
 	private:
 		Type t;
@@ -89,6 +91,7 @@ public:
 	int GetPosY() const noexcept;
 	bool LeftIsPressed() const noexcept;
 	bool RightIsPressed() const noexcept;
+	bool IsInWindow() const noexcept;
 	Mouse::Event Read() noexcept;
 	bool IsEmpty() const noexcept
 	{
@@ -97,6 +100,8 @@ public:
 	void Flush() noexcept;
 private:
 	void OnMouseMove(int newX, int newY) noexcept;
+	void onMouseLeave() noexcept;
+	void onMouseEnter() noexcept;
 	void OnLeftPressed(int x, int y) noexcept;
 	void OnLeftReleased(int x, int y) noexcept;
 	void OnRightPressed(int x, int y) noexcept;
@@ -106,8 +111,9 @@ private:
 	void TrimBuffer() noexcept;
 
 private:
-	bool leftIsPressed;
-	bool rightIsPressed;
+	bool leftIsPressed = false;
+	bool rightIsPressed = false;
+	bool isInWindow = false;
 	int x, y;
 	static constexpr unsigned int bufferSize = 16u;
 	std::queue<Event> buffer;

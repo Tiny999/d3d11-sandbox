@@ -53,7 +53,7 @@ Window::Window(int width, int height, const char* name)
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top; 
-	if (FAILED(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE)))
+	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
 		throw WND_LAST_EXCEPT();
 	}
@@ -75,6 +75,14 @@ Window::Window(int width, int height, const char* name)
 Window::~Window()
 {
 	DestroyWindow(hWnd);
+}
+
+void Window::SetTitle(const std::string title)
+{
+	if (SetWindowTextA(hWnd, title.c_str()) == 0)
+	{
+		throw WND_LAST_EXCEPT();
+	}
 }
 
 LRESULT Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -137,28 +145,63 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		kbd.OnChar(static_cast<unsigned char>(wParam));
 		break;
 
-	/******************* KEYBOARD EVENTS ********************/
+	/******************* MOUSE EVENTS ********************/
 	case WM_MOUSEMOVE:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
-		mouse.OnMouseMove(pt.x, pt.y);
+		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
+		{
+			// Mouse is in window, fire mouse move event
+			mouse.OnMouseMove(pt.x, pt.y);
+			if (!mouse.IsInWindow())
+			{
+				// Mouse is just entering the window for the first time, so fire mouse enter event and capture mouse
+				SetCapture(hWnd);
+				mouse.onMouseEnter();
+			}
+		}
+		else
+		{
+			// If Mouse is outside window but key is still being pressed => Keep calling mouse move
+			if (wParam & (MK_LBUTTON | MK_RBUTTON))
+			{
+				mouse.OnMouseMove(pt.x, pt.y);
+			}
+			else
+			{
+				// Key no longer pressed => uncapture mouse
+				ReleaseCapture();
+				mouse.onMouseLeave();
+			}
+		}
 		break;
+	}
 	case WM_LBUTTONDOWN:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
 		break;
+	}
 	case WM_LBUTTONUP:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
 		break;
+	}
 	case WM_RBUTTONDOWN:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightPressed(pt.x, pt.y);
 		break;
+	}
 	case WM_RBUTTONUP:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
 		break;
+	}
 	case WM_MOUSEWHEEL:
+	{
 		POINTS pt = MAKEPOINTS(lParam);
 		if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
 		{
@@ -169,6 +212,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 			mouse.OnWheelDown(pt.x, pt.y);
 		}
 		break;
+	}
 	}
 
 	return DefWindowProcW(hWnd, msg, wParam, lParam);
