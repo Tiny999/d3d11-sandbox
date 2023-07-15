@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include "Exception.h"
+#include "App.h"
 #include <sstream>
 #include <iostream>
 
@@ -13,24 +14,7 @@ int CALLBACK WinMain(
 ) 
 {
 	try {
-		Window wnd(800, 300, "Direct3d11 Sandbox");
-
-		// Message Pump
-		MSG msg;
-		BOOL gResult;
-
-		while ((gResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
-		{
-			TranslateMessage(&msg);
-			DispatchMessageA(&msg);
-		}
-
-		if (gResult == -1)
-		{
-			return -1;
-		}
-
-		return msg.wParam;
+		return App{}.Go();
 	}
 	catch (const Exception& e)
 	{

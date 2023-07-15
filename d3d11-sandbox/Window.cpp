@@ -26,11 +26,11 @@ Window::WindowClass::WindowClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hIcon = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));
+	wc.hIcon = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
 	wc.hCursor = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));;
+	wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));;
 
 	// Register Window Class
 	RegisterClassEx(&wc);
@@ -40,6 +40,28 @@ Window::WindowClass::WindowClass() noexcept
 Window::WindowClass::~WindowClass()
 { 
     UnregisterClass(wndClassName, GetInstance());
+}
+
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+
+	// while message queue has messages, dispatch them (but do not block)
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		// Check for quit message and return code to signify that app is quitting
+		if (msg.message == WM_QUIT)
+		{
+			return msg.wParam;
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessageA(&msg);
+	}
+
+
+	// return empty optional when not quitting app
+	return {};
 }
 
 Window::Window(int width, int height, const char* name)
