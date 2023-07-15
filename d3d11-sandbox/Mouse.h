@@ -108,6 +108,7 @@ private:
 	void OnRightReleased(int x, int y) noexcept;
 	void OnWheelUp(int x, int y) noexcept;
 	void OnWheelDown(int x, int y) noexcept;
+	void onWheelDelta(int x, int y, int delta) noexcept;
 	void TrimBuffer() noexcept;
 
 private:
@@ -115,6 +116,7 @@ private:
 	bool rightIsPressed = false;
 	bool isInWindow = false;
 	int x, y;
+	int wheelDeltaCarry = 0;
 	static constexpr unsigned int bufferSize = 16u;
 	std::queue<Event> buffer;
 };
