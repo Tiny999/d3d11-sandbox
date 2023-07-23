@@ -92,6 +92,9 @@ Window::Window(int width, int height, const char* name)
 
 	// Show Window 
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
+
+	// Create graphics object
+	pGfx = std::make_unique<Graphics>(hWnd);
 }
 
 Window::~Window()
@@ -105,6 +108,11 @@ void Window::SetTitle(const std::string title)
 	{
 		throw WND_LAST_EXCEPT();
 	}
+}
+
+Graphics& Window::Gfx()
+{
+	return *pGfx;
 }
 
 LRESULT Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -230,12 +238,12 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 	}
 
-	return DefWindowProcW(hWnd, msg, wParam, lParam);
+	return DefWindowProcA(hWnd, msg, wParam, lParam);
 }
 
 Window::WinException::WinException(int line, const char* file, HRESULT hr) noexcept
 	:
-	hr(hr),
+	hr(hr), 
 	Exception(line, file)
 {}
 

@@ -1,5 +1,7 @@
 #include "Graphics.h"
 
+#pragma comment(lib, "d3d11.lib")
+
 Graphics::Graphics(HWND hWnd)
 {
 
@@ -36,6 +38,20 @@ Graphics::Graphics(HWND hWnd)
 		nullptr,
 		&pContext
 	);
+
+	// access swapchain subresource (back buffer)
+	ID3D11Resource* pBackBuffer = nullptr;
+	pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
+
+	// create render target view
+	pDevice->CreateRenderTargetView(
+		pBackBuffer,
+		nullptr,
+		&pTarget
+	);
+
+	// dispose backbuffer
+	pBackBuffer->Release();
 }
 
 Graphics::~Graphics()
@@ -52,4 +68,19 @@ Graphics::~Graphics()
 	{
 		pContext->Release();
 	}
+	if (pTarget != nullptr)
+	{
+		pTarget->Release();
+	}
+}
+
+void Graphics::EndFrame()
+{
+	pSwap->Present(1u, 0u);
+}
+
+void Graphics::ClearBuffer(float red, float green, float blue) noexcept
+{
+	const float color[] = { red,green,blue, 1.0f };
+	pContext->ClearRenderTargetView(pTarget, color);
 }

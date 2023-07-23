@@ -1,10 +1,12 @@
 #pragma once
 
+#include <optional>
+#include <memory>
 #include "Win.h"
 #include "Exception.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include <optional>
+#include "Graphics.h"
 
 class Window
 {
@@ -44,6 +46,7 @@ public:
 	Window& operator = (const Window&) = delete;
 	static std::optional<int> ProcessMessages();
 	void SetTitle(const std::string title);
+	Graphics& Gfx();
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -55,6 +58,7 @@ private:
 	int width;
 	int height;
 	HWND hWnd;
+	std::unique_ptr<Graphics> pGfx;
 };
 
  

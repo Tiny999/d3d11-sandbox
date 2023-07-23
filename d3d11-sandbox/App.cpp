@@ -3,7 +3,7 @@
 
 App::App()
 	:
-	wnd(800, 300, "Direct3d11 Sandbox")
+	wnd(800, 600, "Direct3d11 Sandbox")
 {
 }
 
@@ -17,9 +17,13 @@ int App::Go()
 			// if ecode has value, return ecode (most likely will be exitcode 0)
 			return *ecode;
 		}
+
+		DoFrame();
 	}
 }
 
 void App::DoFrame()
 {
+	wnd.Gfx().ClearBuffer(0.0f, 1.0f, 1.f);
+	wnd.Gfx().EndFrame();
 }
