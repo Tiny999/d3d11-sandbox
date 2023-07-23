@@ -1,10 +1,12 @@
 #include "Graphics.h"
 #include "dxerr.h"
 #include <sstream>
+#include <d3dcompiler.h>
 
 namespace wrl = Microsoft::WRL;
 
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "D3DCompiler.lib")
 
 #define GFX_THROW_FAILED(hrcall) if(FAILED(hr = (hrcall))) throw Graphics::HrException(__LINE__, __FILE__, hr)
 #define GFX_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException(__LINE__, __FILE__, (hr))
@@ -88,7 +90,7 @@ void Graphics::DrawTestTriangle()
 		float x;
 		float y;
 	};
-
+	// Create vertex buffer and assign vertices
 	const Vertex vertices[] =
 	{
 		{ 0.0f, 0.5f },
@@ -113,12 +115,23 @@ void Graphics::DrawTestTriangle()
 
 	GFX_THROW_FAILED(pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer));
 
+	//Set vertex buffers
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
 
 	pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 
-	GFX_THROW_INFO_ONLY(pContext->Draw(3u, 0u));
+	// Create Vertex Shader
+	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
+
+	wrl::ComPtr<ID3DBlob> pBlob;
+	GFX_THROW_FAILED(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
+	GFX_THROW_FAILED(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
+
+	// bind vertex shader
+	pContext->VSSetShader(pVertexShader.Get(), 0, 0);
+
+	GFX_THROW_INFO_ONLY(pContext->Draw((UINT)std::size(vertices), 0u));
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
