@@ -89,13 +89,20 @@ void Graphics::DrawTestTriangle()
 	{
 		float x;
 		float y;
+		unsigned char r;
+		unsigned char g;
+		unsigned char b;
+		unsigned char a;
 	};
 	// Create vertex buffer and assign vertices
 	const Vertex vertices[] =
 	{
-		{ 0.0f, 0.5f },
-		{ 0.5f, -0.5f },
-		{ -0.5f, -0.5f }
+		{ 0.0f, 0.5f,255, 255, 0, 1 },
+		{ 0.5f, -0.5f, 0, 255, 0, 1 },
+		{ -0.5f, -0.5f, 0, 0, 255,1 },
+		{-0.3f, 0.3f, 0, 255, 0,0  },
+		{0.3f, 0.3f, 0,0,255,0},
+		{0.0f, -0.8f, 255,0,0,0},
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -115,11 +122,38 @@ void Graphics::DrawTestTriangle()
 
 	GFX_THROW_FAILED(pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer));
 
-	//Set vertex buffers
+
+	//Set vertex buffers to pipeline
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
 
 	pContext->IASetVertexBuffers(0, 1, pVertexBuffer.GetAddressOf(), &stride, &offset);
+
+	// create index buffer
+	const unsigned short indices[]
+	{
+		0,1,2,
+		0,2,3,
+		0,4,1,
+		2,1,5
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
+	D3D11_BUFFER_DESC ibd = {};
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.Usage = D3D11_USAGE_DEFAULT;
+	ibd.CPUAccessFlags = 0u;
+	ibd.MiscFlags = 0u;
+	ibd.ByteWidth = sizeof(indices);
+	ibd.StructureByteStride = sizeof(unsigned short);
+
+	D3D11_SUBRESOURCE_DATA isd = {};
+	isd.pSysMem = indices;
+
+	GFX_THROW_FAILED(pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer));
+
+	// bind index buffer
+	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
 	wrl::ComPtr<ID3DBlob> pBlob;
 
@@ -144,6 +178,7 @@ void Graphics::DrawTestTriangle()
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] = {
 		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 8u, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	GFX_THROW_FAILED(pDevice->CreateInputLayout(
@@ -176,7 +211,7 @@ void Graphics::DrawTestTriangle()
 
 
 
-	GFX_THROW_INFO_ONLY(pContext->Draw((UINT)std::size(vertices), 0u));
+	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(std::size(indices), 0u, 0));
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
