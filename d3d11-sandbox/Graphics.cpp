@@ -2,8 +2,11 @@
 #include "dxerr.h"
 #include <sstream>
 #include <d3dcompiler.h>
+#include <cmath>
+#include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
+namespace dx = DirectX;
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -82,27 +85,34 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
-void Graphics::DrawTestTriangle()
+void Graphics::DrawTestTriangle(const float angle, float x, float y)
 {
 
 	struct Vertex
 	{
 		float x;
 		float y;
-		unsigned char r;
-		unsigned char g;
-		unsigned char b;
-		unsigned char a;
+		float z;
+		struct
+		{
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+			unsigned char a;
+		} color;
+		
 	};
 	// Create vertex buffer and assign vertices
 	const Vertex vertices[] =
 	{
-		{ 0.0f, 0.5f,255, 255, 0, 1 },
-		{ 0.5f, -0.5f, 0, 255, 0, 1 },
-		{ -0.5f, -0.5f, 0, 0, 255,1 },
-		{-0.3f, 0.3f, 0, 255, 0,0  },
-		{0.3f, 0.3f, 0,0,255,0},
-		{0.0f, -0.8f, 255,0,0,0},
+		{-1.0f, -1.0f, -1.0f,255, 255, 0, 1 },
+		{ 1.0f, -1.0f, -1.0f, 0, 255, 0, 1 },
+		{ -1.5f, 1.0f, -1.0f, 0, 0, 255,1 },
+		{1.0f, 1.0f, -1.0f, 255, 255, 0, 0},
+		{-1.0f, -1.0f, 1.0f, 0, 255, 0,0  },
+		{1.0f, -1.0f, 1.0f, 0, 255, 255, 0},
+		{-1.0f, 1.0f, 1.0f, 0,0,0,0},
+		{1.0f, 1.0f, 1.0f, 255,0,0,0},
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -132,10 +142,12 @@ void Graphics::DrawTestTriangle()
 	// create index buffer
 	const unsigned short indices[]
 	{
-		0,1,2,
-		0,2,3,
-		0,4,1,
-		2,1,5
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
@@ -157,6 +169,86 @@ void Graphics::DrawTestTriangle()
 
 	wrl::ComPtr<ID3DBlob> pBlob;
 
+
+	// Create and bind constant buffer
+
+	struct ConstantBuffer
+	{
+		dx::XMMATRIX transform;
+	};
+
+	const ConstantBuffer cb =
+	{
+		{
+			dx::XMMatrixTranspose(
+				dx::XMMatrixRotationZ(angle)*
+				dx::XMMatrixRotationX(angle) *
+				dx::XMMatrixTranslation(x,y,4.0f) *
+				dx::XMMatrixPerspectiveLH(1.0f, (3.0f / 4.0f), 0.5f, 10.f)
+			)
+		}
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pConstBuffer;
+	D3D11_BUFFER_DESC cbd = {};
+	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd.Usage = D3D11_USAGE_DYNAMIC;
+	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbd.MiscFlags = 0u;
+	cbd.ByteWidth = sizeof(cb);
+	cbd.StructureByteStride = 0u;
+
+	D3D11_SUBRESOURCE_DATA csd = {};
+	csd.pSysMem = &cb;
+
+	GFX_THROW_FAILED(pDevice->CreateBuffer(&cbd, &csd, &pConstBuffer));
+
+	// bind constant buffer to VS
+	pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
+
+
+	struct ConstantBuffer2
+	{
+		struct
+		{
+			float r;
+			float g;
+			float b;
+			float a;
+		} face_colors[6];
+	};
+
+	ConstantBuffer2 cb2 =
+	{
+		{
+			{1.0f, 0.0f, 1.0f},
+			{1.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			{0.0f, 0.0f, 1.0f},
+			{1.0f, 1.0f, 0.0f},
+			{0.0f, 1.0f, 1.0f},
+
+		}		
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pConstBuffer2;
+	D3D11_BUFFER_DESC cbd2 = {};
+	cbd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd2.Usage = D3D11_USAGE_DYNAMIC;
+	cbd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbd2.MiscFlags = 0u;
+	cbd2.ByteWidth = sizeof(cb2);
+	cbd2.StructureByteStride = 0u;
+
+	D3D11_SUBRESOURCE_DATA csd2 = {};
+	csd.pSysMem = &cb2;
+	
+	GFX_THROW_FAILED(pDevice->CreateBuffer(&cbd2, &csd2, &pConstBuffer2));
+
+	// bind constant buffer to VS
+	pContext->PSSetConstantBuffers(0u, 1u, pConstBuffer2.GetAddressOf());
+
+
 	// Create Pixel Shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	GFX_THROW_FAILED(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
@@ -177,8 +269,8 @@ void Graphics::DrawTestTriangle()
 	// create input (vertex) layout obj
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] = {
-		{"Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 8u, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	GFX_THROW_FAILED(pDevice->CreateInputLayout(
