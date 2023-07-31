@@ -92,27 +92,19 @@ void Graphics::DrawTestTriangle(const float angle, float x, float y)
 	{
 		float x;
 		float y;
-		float z;
-		struct
-		{
-			unsigned char r;
-			unsigned char g;
-			unsigned char b;
-			unsigned char a;
-		} color;
-		
+		float z;		
 	};
 	// Create vertex buffer and assign vertices
 	const Vertex vertices[] =
 	{
-		{-1.0f, -1.0f, -1.0f,255, 255, 0, 1 },
-		{ 1.0f, -1.0f, -1.0f, 0, 255, 0, 1 },
-		{ -1.5f, 1.0f, -1.0f, 0, 0, 255,1 },
-		{1.0f, 1.0f, -1.0f, 255, 255, 0, 0},
-		{-1.0f, -1.0f, 1.0f, 0, 255, 0,0  },
-		{1.0f, -1.0f, 1.0f, 0, 255, 255, 0},
-		{-1.0f, 1.0f, 1.0f, 0,0,0,0},
-		{1.0f, 1.0f, 1.0f, 255,0,0,0},
+		{-1.0f, -1.0f, -1.0f },
+		{ 1.0f, -1.0f, -1.0f },
+		{ -1.5f, 1.0f, -1.0f },
+		{1.0f, 1.0f, -1.0f},
+		{-1.0f, -1.0f, 1.0f  },
+		{1.0f, -1.0f, 1.0f},
+		{-1.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f},
 	};
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -241,11 +233,11 @@ void Graphics::DrawTestTriangle(const float angle, float x, float y)
 	cbd2.StructureByteStride = 0u;
 
 	D3D11_SUBRESOURCE_DATA csd2 = {};
-	csd.pSysMem = &cb2;
+	csd2.pSysMem = &cb2;
 	
 	GFX_THROW_FAILED(pDevice->CreateBuffer(&cbd2, &csd2, &pConstBuffer2));
 
-	// bind constant buffer to VS
+	// bind constant buffer to PS
 	pContext->PSSetConstantBuffers(0u, 1u, pConstBuffer2.GetAddressOf());
 
 
@@ -270,7 +262,6 @@ void Graphics::DrawTestTriangle(const float angle, float x, float y)
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] = {
 		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	GFX_THROW_FAILED(pDevice->CreateInputLayout(
