@@ -5,6 +5,7 @@
 #include <wrl.h>
 #include <vector>
 #include "DxgiInfoManager.h"
+#include "GraphicsThrowMacros.h"
 
 class Graphics
 {

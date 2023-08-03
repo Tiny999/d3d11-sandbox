@@ -7,6 +7,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "WindowThrowMacros.h"
 
 class Window
 {
@@ -61,7 +62,3 @@ private:
 	std::unique_ptr<Graphics> pGfx;
 };
 
- 
-// Error exception helper macro
-#define WND_EXCEPT(hr) Window::WinException(__LINE__, __FILE__, hr)
-#define WND_LAST_EXCEPT() Window::WinException(__LINE__, __FILE__, GetLastError())
