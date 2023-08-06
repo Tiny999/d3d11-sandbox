@@ -171,6 +171,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Bindable.h" />
     <ClInclude Include="ChiliTimer.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DxgiInfoManager.h" />
     <ClInclude Include="Exception.h" />
