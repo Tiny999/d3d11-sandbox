@@ -72,6 +72,9 @@
     <ClCompile Include="InputLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Topology.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -132,6 +135,9 @@
       <Filter>Header Files\Bindable</Filter>
     </ClInclude>
     <ClInclude Include="InputLayout.h">
+      <Filter>Header Files\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="Topology.h">
       <Filter>Header Files\Bindable</Filter>
     </ClInclude>
   </ItemGroup>
