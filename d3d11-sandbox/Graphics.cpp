@@ -336,6 +336,12 @@ void Graphics::DrawTestTriangle(const float angle, float x, float y)
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(std::size(indices), 0u, 0));
 }
 
+void Graphics::DrawIndexed(const UINT count)
+{
+	HRESULT hr;
+	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0));
+}
+
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
 	:
 	GfxException(line, file),

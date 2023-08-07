@@ -51,6 +51,7 @@ public:
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue) noexcept;
 	void DrawTestTriangle(const float angle, float x, float y);
+	void DrawIndexed(const UINT count);
 private:
 	#ifndef NDEBUG
 		DxgiInfoManager infoManager;

@@ -9,6 +9,16 @@ public:
 	{
 		HRESULT hr;
 
+		D3D11_MAPPED_SUBRESOURCE msr;
+		GFX_THROW_FAILED(GetContext(gfx)->Map(
+			pConstantBuffer.Get(), 
+			0u, D3D11_MAP_WRITE_DISCARD, 
+			0u, &msr
+		));
+
+		memccpy(msr.pData, &consts, sizeof(consts));
+		GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u);
+
 	}
 	ConstantBuffer(Graphics& gfx, const C& consts)
 	{
