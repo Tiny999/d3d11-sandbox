@@ -3,7 +3,6 @@
 #include <sstream>
 #include <d3dcompiler.h>
 #include <cmath>
-#include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
@@ -99,6 +98,16 @@ Graphics::Graphics(HWND hWnd)
 
 	// bind depth stencil view to OM
 	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
+
+	// configure viewport
+	D3D11_VIEWPORT vp;
+	vp.Width = 800;
+	vp.Height = 600;
+	vp.MinDepth = 0;
+	vp.MaxDepth = 1;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+	pContext->RSSetViewports(1u, &vp);
 
 }
 
@@ -340,6 +349,16 @@ void Graphics::DrawIndexed(const UINT count)
 {
 	HRESULT hr;
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(count, 0u, 0));
+}
+
+void Graphics::SetProjection(DirectX::XMMATRIX proj)
+{
+	projection = proj;
+}
+
+DirectX::XMMATRIX Graphics::GetProjection() const noexcept
+{
+	return projection;
 }
 
 Graphics::HrException::HrException(int line, const char* file, HRESULT hr) noexcept

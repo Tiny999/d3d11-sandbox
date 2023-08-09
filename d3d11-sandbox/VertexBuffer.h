@@ -24,7 +24,7 @@ public:
 		D3D11_SUBRESOURCE_DATA sd = {};
 		sd.pSysMem = vertices.data();
 
-		GetDevice(gfx)->CreateBuffer(&bd, &sd, &pVertexBuffer);
+		GFX_THROW_FAILED(GetDevice(gfx)->CreateBuffer(&bd, &sd, &pVertexBuffer));
 
 	}
 

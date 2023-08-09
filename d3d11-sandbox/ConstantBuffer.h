@@ -16,7 +16,7 @@ public:
 			0u, &msr
 		));
 
-		memccpy(msr.pData, &consts, sizeof(consts));
+		memcpy(msr.pData, &consts, sizeof(consts));
 		GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u);
 
 	}
@@ -26,10 +26,10 @@ public:
 
 		D3D11_BUFFER_DESC bd = {};
 		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
 		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bd.MiscFlags = 0u;
-		bd.ByteWidth = size(consts);
+		bd.ByteWidth = sizeof(consts);
 		bd.StructureByteStride = 0u;
 
 
@@ -38,7 +38,7 @@ public:
 
 		GFX_THROW_FAILED(GetDevice(gfx)->CreateBuffer(&bd, &sd, &pConstantBuffer));
 	}
-	ConstantBuffer(Graphics& gfc)
+	ConstantBuffer(Graphics& gfx)
 	{
 		HRESULT hr;
 
@@ -63,8 +63,8 @@ class VertexConstantBuffer : public ConstantBuffer<C>
 	using ConstantBuffer<C>::pConstantBuffer;
 	using Bindable::GetContext;
 public:
-	using ConstantBuffer<C> ConstantBuffer;
-	void Bind(Grapics& gfx) noexcept override
+	using ConstantBuffer<C>::ConstantBuffer;
+	void Bind(Graphics& gfx) noexcept override
 	{
 		GetContext(gfx)->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
 	}
@@ -76,8 +76,8 @@ class PixelConstantBuffer : public ConstantBuffer<C>
 	using ConstantBuffer<C>::pConstantBuffer;
 	using Bindable::GetContext;
 public:
-	using ConstantBuffer<C> ConstantBuffer;
-	void Bind(Grapics& gfx) noexcept override
+	using ConstantBuffer<C>::ConstantBuffer;
+	void Bind(Graphics& gfx) noexcept override
 	{
 		GetContext(gfx)->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
 	}

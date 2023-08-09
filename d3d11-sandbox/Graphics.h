@@ -6,6 +6,7 @@
 #include <vector>
 #include "DxgiInfoManager.h"
 #include "GraphicsThrowMacros.h"
+#include <DirectXMath.h>
 
 class Graphics
 {
@@ -52,6 +53,10 @@ public:
 	void ClearBuffer(float red, float green, float blue) noexcept;
 	void DrawTestTriangle(const float angle, float x, float y);
 	void DrawIndexed(const UINT count);
+	void SetProjection(DirectX::XMMATRIX proj);
+	DirectX::XMMATRIX GetProjection() const noexcept;
+private:
+	DirectX::XMMATRIX projection;
 private:
 	#ifndef NDEBUG
 		DxgiInfoManager infoManager;
