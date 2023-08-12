@@ -9,9 +9,13 @@ void Drawable::Draw(Graphics& gfx) const noexcept(!IS_DEBUG)
 	{
 		b->Bind(gfx);
 	}
+	for (const auto& b : GetStaticBinds())
+	{
+		b->Bind(gfx);
+	}
 	gfx.DrawIndexed(pIndexBuffer->GetCount());
 }
-
+ 
 void Drawable::AddBind(std::unique_ptr<Bindable> bind) noexcept(!IS_DEBUG)
 {
 	assert("*Must* use AddIndexBuffer to bind index buffer" && typeid(*bind) != typeid(IndexBuffer));
