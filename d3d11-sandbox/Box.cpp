@@ -1,19 +1,15 @@
 #include "Box.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "InputLayout.h"
-#include "VertexShader.h"
-#include "PixelShader.h"
-#include "ConstantBuffer.h"
-#include "Topology.h"
+#include "BindableBase.h"
 #include "TransformCbuf.h"
+#include "Cube.h"
 #include <memory>
 
 Box::Box(Graphics& gfx, std::mt19937& rng,
     std::uniform_real_distribution<float>& adist,
     std::uniform_real_distribution<float>& ddist,
     std::uniform_real_distribution<float>& odist,
-    std::uniform_real_distribution<float>& rdist
+    std::uniform_real_distribution<float>& rdist,
+    std::uniform_real_distribution<float>& bdist
 )
     :
     r(rdist(rng)),
@@ -31,26 +27,12 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
     {
         struct Vertex
         {
-            struct
-            {
-                float x;
-                float y;
-                float z;
-            } pos;
+            DirectX::XMFLOAT3 pos;
         };
 
-        const std::vector<Vertex> vertices = {
-            {-1.0f, -1.0f, -1.0f },
-            { 1.0f, -1.0f, -1.0f },
-            { -1.5f, 1.0f, -1.0f },
-            {1.0f, 1.0f, -1.0f},
-            {-1.0f, -1.0f, 1.0f  },
-            {1.0f, -1.0f, 1.0f},
-            {-1.0f, 1.0f, 1.0f},
-            {1.0f, 1.0f, 1.0f},
-        };
+        const auto model = Cube::Make<Vertex>();
 
-        AddStaticBind(std::make_unique<VertexBuffer>(gfx, vertices));
+        AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
 
         auto pvs = std::make_unique<VertexShader>(gfx, L"VertexShader.cso");
         auto pvsbc = pvs->GetBytecode();
@@ -78,17 +60,19 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
                 float g;
                 float b;
                 float a;
-            } face_colors[6];
+            } face_colors[8];
         };
         const ConstantBuffer2 cb2 =
         {
             {
-                { 1.0f,0.0f,1.0f },
+                { 1.0f,1.0f,1.0f },
                 { 1.0f,0.0f,0.0f },
                 { 0.0f,1.0f,0.0f },
-                { 0.0f,0.0f,1.0f },
                 { 1.0f,1.0f,0.0f },
+                { 0.0f,0.0f,1.0f },
+                { 1.0f,0.0f,1.0f },
                 { 0.0f,1.0f,1.0f },
+                { 0.0f,0.0f,0.0f },
             }
         };
 
@@ -107,6 +91,12 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
     }
 
     AddBind(std::make_unique<TransformCbuf>(gfx, *this));
+
+    // model deformation transform (per instance, not stored as bind)
+    DirectX::XMStoreFloat3x3(
+        &mt,
+        DirectX::XMMatrixScaling(1.0f, 1.0f, bdist(rng))
+    );
 }
 
 void Box::Update(float dt) noexcept
