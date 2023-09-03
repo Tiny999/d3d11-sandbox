@@ -8,7 +8,6 @@
 #include "Sheet.h"
 #include "Box.h"
 #include "imgui/imgui_impl_dx11.h"
-#include "imgui/imgui_impl_win32.h"
 
 GDIPlusManager gdipm;
 
@@ -90,27 +89,18 @@ int App::Go()
 void App::DoFrame()
 {
 	auto dt = timer.Mark();
-	wnd.Gfx().ClearBuffer(0.07f, 0.0f, 0.12f);
+	wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 	for (auto& d : drawables)
 	{
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(wnd.Gfx());
 	}
 
-	// imgui setup
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
 	static bool show_demo_window = true;
 	if (show_demo_window)
 	{
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
-
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
 
 	wnd.Gfx().EndFrame();
 }

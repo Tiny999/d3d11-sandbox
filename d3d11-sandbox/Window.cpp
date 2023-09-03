@@ -159,6 +159,9 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	{
 		return true;
 	}
+
+	const auto& imio = ImGui::GetIO();
+
 	switch (msg)
 	{
 	case WM_CLOSE:
@@ -173,22 +176,46 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	/******************* KEYBOARD EVENTS ********************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
+		if (imio.WantCaptureKeyboard)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		if (!(lParam & 0x40000000) || kbd.AutorepeatIsEnabled())
 		{
 			kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
 		}
 		break;
 	case WM_KEYUP:
+		if (imio.WantCaptureKeyboard)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		kbd.onKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
 	case WM_SYSKEYUP:
+		if (imio.WantCaptureKeyboard)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		kbd.OnChar(static_cast<unsigned char>(wParam));
 		break;
 
 	/******************* MOUSE EVENTS ********************/
 	case WM_MOUSEMOVE:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
 		{
@@ -219,30 +246,60 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 	case WM_LBUTTONDOWN:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONDOWN:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
 		break;
 	}
 	case WM_MOUSEWHEEL:
 	{
+		if (imio.WantCaptureMouse)
+		{
+			// If imgui capturing this message, don't pass on to window
+			break;
+		}
+
 		POINTS pt = MAKEPOINTS(lParam);
 		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		mouse.onWheelDelta(pt.x, pt.y, delta);
