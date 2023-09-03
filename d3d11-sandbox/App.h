@@ -3,6 +3,7 @@
 #include "ChiliTimer.h"
 #include "Drawable.h"
 #include "ImGuiManager.h"
+#include "Camera.h"
 
 class App
 {
@@ -13,6 +14,7 @@ public:
 private:
 	void DoFrame();
 private:
+	Camera camera;
 	ImGuiManager imgui;
 	Window wnd;
 	ChiliTimer timer;

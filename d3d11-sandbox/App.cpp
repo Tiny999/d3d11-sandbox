@@ -69,7 +69,6 @@ App::App()
 	std::generate_n(std::back_inserter(drawables), nDrawables, f);
 
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
-	wnd.Gfx().SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
 }
 
 int App::Go()
@@ -91,17 +90,16 @@ void App::DoFrame()
 {
 	auto dt = timer.Mark();
 	wnd.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
+	wnd.Gfx().SetCamera(camera.GetMatrix());
+
 	for (auto& d : drawables)
 	{
 		d->Update(wnd.kbd.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(wnd.Gfx());
 	}
 
-	static bool show_demo_window = true;
-	if (show_demo_window)
-	{
-		ImGui::ShowDemoWindow(&show_demo_window);
-	}
+	// camera control window
+	camera.SpawnControlWindow();
 
 	wnd.Gfx().EndFrame();
 }

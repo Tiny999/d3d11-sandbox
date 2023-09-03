@@ -29,12 +29,11 @@ void Camera::SpawnControlWindow() noexcept
 		ImGui::SliderAngle("Pitch", &pitch, -180.f, 180.f);
 		ImGui::SliderAngle("Yaw", &yaw, -180.f, 180.f);
 
-		if (ImGui::Begin("Reset"))
+		if (ImGui::Button("Reset"))
 		{
 			Reset();
 		}
 	}
-
 	ImGui::End(); 
 }
 
