@@ -4,7 +4,7 @@
 PointLight::PointLight(Graphics& gfx, float radius)
 	:
 	mesh(gfx, radius),
-	cbuf(gfx)
+	cbuf(gfx,0)
 {
 	Reset();
 }
@@ -22,7 +22,6 @@ void PointLight::SpawnControlWindow() noexcept
 		ImGui::SliderFloat("Intensity", &cbData.diffuseIntensity, 0.0f, 5.0f, "%.1f");
 		ImGui::ColorEdit3("Diffuse Color", &cbData.diffuseColor.x);
 		ImGui::ColorEdit3("Ambient Color", &cbData.ambientColor.x);
-		ImGui::ColorEdit3("Material Color", &cbData.materialColor.x);
 
 		ImGui::Text("Falloff ");
 		ImGui::SliderFloat("Constant", &cbData.attConst, 0.05f, 10.0f, "%.2f");
@@ -41,7 +40,6 @@ void PointLight::Reset() noexcept
 {
 	cbData = {
 		{0.0f, 0.0f, 0.0f},
-		{0.7f, 0.7f, 0.9f},
 		{0.05f, 0.05f, 0.05f},
 		{1.0f, 1.0f, 1.0f},
 		1.0f,
