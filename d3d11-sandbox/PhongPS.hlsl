@@ -1,15 +1,14 @@
 cbuffer LightCBuf
 {
     float3 lightPos;
+    float3 materialColor;
+    float3 ambient;
+    float3 diffuseColor;
+    float diffuseIntensity;
+    float attConst;
+    float attLin;
+    float attQuad;
 };
-
-static const float3 materialColor = { 0.7f, 0.7f, 0.9f };
-static const float3 ambient = { 0.15f, 0.15f, 0.15f };
-static const float3 diffuseColor = { 1.f, 1.f, 1.f };
-static const float diffuseIntensity = 1.0f;
-static const float attConst = 1.0f; 
-static const float attLin = 0.045f;
-static const float attQuad = 0.0075f;
 
 float4 main(float3 worldPos : Position, float3 n : Normal) : SV_TARGET
 {
@@ -25,5 +24,5 @@ float4 main(float3 worldPos : Position, float3 n : Normal) : SV_TARGET
     const float3 diffuse = diffuseColor * diffuseIntensity * att * max(0.0f, dot(dirToL, n));
         
     // final color 
-    return float4(saturate(diffuse + ambient), 1.0f);
+    return float4(saturate((diffuse + ambient) * materialColor), 1.0f);
 }
