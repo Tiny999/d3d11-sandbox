@@ -63,8 +63,10 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
 
     struct PSMaterialConstant
     {
-        DirectX::XMFLOAT3 color;
-        float padding;
+        alignas(16) DirectX::XMFLOAT3 color;
+        float specularIntensity = 0.6f;
+        float specularPower = 30.0f;
+        float padding[2]; 
     } colorConst;
 
     colorConst.color = material;
