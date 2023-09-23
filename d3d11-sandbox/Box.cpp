@@ -4,7 +4,8 @@
 #include "Cube.h"
 #include <memory>
 
-Box::Box(Graphics& gfx, std::mt19937& rng,
+Box::Box(Graphics& gfx, 
+    std::mt19937& rng,
     std::uniform_real_distribution<float>& adist,
     std::uniform_real_distribution<float>& ddist,
     std::uniform_real_distribution<float>& odist,
@@ -13,16 +14,7 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
     DirectX::XMFLOAT3 material
 )
     :
-    r(rdist(rng)),
-    droll(ddist(rng)),
-    dpitch(ddist(rng)),
-    dyaw(ddist(rng)),
-    dphi(odist(rng)),
-    dtheta(odist(rng)),
-    dchi(odist(rng)),
-    chi(adist(rng)),
-    theta(adist(rng)),
-    phi(adist(rng))
+    TestObject(gfx, rng, adist, ddist, odist, rdist)
 {
     if (!isStaticInitialized())
     {
@@ -79,19 +71,8 @@ Box::Box(Graphics& gfx, std::mt19937& rng,
     );
 }
 
-void Box::Update(float dt) noexcept
-{
-    roll += droll * dt;
-    pitch += dpitch * dt;
-    yaw += dyaw * dt;
-    theta += dtheta * dt;
-    phi += dphi * dt;
-    chi += dchi * dt;
-}
-
 DirectX::XMMATRIX Box::GetTransformXM() const noexcept
 {
-    return DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
-        DirectX::XMMatrixTranslation(r, 0.0f, 0.0f) *
-        DirectX::XMMatrixRotationRollPitchYaw(theta, phi, chi);
+    namespace dx = DirectX;
+    return dx::XMLoadFloat3x3(&mt) * TestObject::GetTransformXM();
 }

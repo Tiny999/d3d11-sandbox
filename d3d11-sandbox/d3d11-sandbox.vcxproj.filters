@@ -281,6 +281,9 @@
     <ClInclude Include="Sphere.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="TestObject.h">
+      <Filter>Header Files\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="d3d11-sandbox.rc">
