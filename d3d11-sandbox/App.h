@@ -5,6 +5,7 @@
 #include "ImGuiManager.h"
 #include "Camera.h"
 #include "PointLight.h"
+#include <set>
 
 class App
 {
@@ -24,5 +25,7 @@ private:
 	std::vector<class Box*> boxes;
 	static constexpr size_t nDrawables = 180;
 	float speed_factor = 1.f;
+	std::optional<int> comboBoxIndex = 1;
+	std::set<int> boxControlIds;
 };
 
