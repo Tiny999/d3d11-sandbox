@@ -21,6 +21,7 @@ private:
 	ChiliTimer timer;
 	PointLight light;
 	std::vector<std::unique_ptr<class Drawable>> drawables;
+	std::vector<class Box*> boxes;
 	static constexpr size_t nDrawables = 180;
 	float speed_factor = 1.f;
 };
