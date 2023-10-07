@@ -15,6 +15,9 @@ public:
 	int Go();
 private:
 	void DoFrame();
+	void SpawnSimulationWindow() noexcept;
+	void SpawnBoxWindowManagerWindow() noexcept;
+	void SpawnBoxWindows() noexcept;
 private:
 	Camera camera;
 	ImGuiManager imgui;
@@ -25,7 +28,7 @@ private:
 	std::vector<class Box*> boxes;
 	static constexpr size_t nDrawables = 180;
 	float speed_factor = 1.f;
-	std::optional<int> comboBoxIndex = 1;
+	std::optional<int> comboBoxIndex = 0;
 	std::set<int> boxControlIds;
 };
 
