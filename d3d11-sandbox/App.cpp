@@ -11,16 +11,23 @@
 #include "Cylinder.h"
 #include "SkinnedBox.h"
 #include "imgui/imgui_impl_dx11.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include <string>
 
 GDIPlusManager gdipm;
 
-App::App()
+App::App()  
 	:
 	wnd(800, 600, "Direct3d11 Sandbox"),
 	light(wnd.Gfx())
 {
+	Assimp::Importer imp;
+	auto model = imp.ReadFile("models\\suzanne.obj", aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+
+
 	class Factory
 	{
 	public:

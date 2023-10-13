@@ -76,6 +76,7 @@ StyleCopReport.xml
 *.ilk
 *.meta
 *.obj
+!d3d11-sandbox/models/*.obj
 *.iobj
 *.pch
 *.pdb
