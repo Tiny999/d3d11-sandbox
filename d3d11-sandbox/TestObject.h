@@ -1,5 +1,6 @@
 #pragma once
 #include "DrawableBase.h"
+#include "MathUtils.h"
 #include <random>
 
 template <class T>
@@ -26,12 +27,12 @@ public:
 
     void Update(float dt) noexcept
     {
-        roll += droll * dt;
-        pitch += dpitch * dt;
-        yaw += dyaw * dt;
-        theta += dtheta * dt;
-        phi += dphi * dt;
-        chi += dchi * dt;
+        roll = wrap_angle(roll + droll * dt);
+        pitch = wrap_angle(pitch + dpitch * dt);
+        yaw = wrap_angle(yaw + dyaw * dt);
+        theta = wrap_angle(theta + dtheta * dt);
+        phi = wrap_angle(phi + dphi * dt);
+        chi = wrap_angle(chi + dchi * dt);
     }
 
     DirectX::XMMATRIX GetTransformXM() const noexcept
@@ -42,7 +43,7 @@ public:
     }
 
 
-private:
+protected:
     //positional
     float r;
     float roll = 0.0f;
