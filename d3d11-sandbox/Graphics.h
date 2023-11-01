@@ -8,9 +8,14 @@
 #include "GraphicsThrowMacros.h"
 #include <DirectXMath.h>
 
+namespace Bind
+{
+	class Bindable;
+}
+
 class Graphics
 {
-	friend class Bindable;
+	friend class Bind::Bindable;
 public:
 	class GfxException : public Exception
 	{

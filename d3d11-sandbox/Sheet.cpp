@@ -1,6 +1,6 @@
 #include "Sheet.h"
 #include "Plane.h"
-#include "BindableBase.h"
+#include "BindableCommon.h"
 #include "Sampler.h"
 #include "Surface.h"
 #include "Texture.h"
@@ -20,6 +20,7 @@ Sheet::Sheet(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<fl
     theta(adist(rng)),
     phi(adist(rng))
 {
+    using namespace Bind;
     namespace dx = DirectX;
 
     if (!isStaticInitialized())

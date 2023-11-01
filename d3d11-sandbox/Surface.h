@@ -5,8 +5,6 @@
 #include <memory>
 #include <assert.h>
 
-
-
 class Surface
 {
 public:

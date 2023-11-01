@@ -2,15 +2,8 @@
 #include "Window.h"
 #include <memory>
 #include <algorithm>
-#include "Surface.h"
 #include "GDIPlusManager.h"
 #include "MathUtils.h"
-#include "Sheet.h"
-#include "Box.h"
-#include "Pyramid.h"
-#include "Cylinder.h"
-#include "SkinnedBox.h"
-#include "TestModel.h"
 #include "imgui/imgui_impl_dx11.h"
 
 #include <string>

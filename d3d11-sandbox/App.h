@@ -5,7 +5,7 @@
 #include "ImGuiManager.h"
 #include "Camera.h"
 #include "PointLight.h"
-#include "Model.h"
+#include "Mesh.h"
 #include <set>
 
 class App

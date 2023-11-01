@@ -1,10 +1,12 @@
 #include "TestModel.h"
-#include "BindableBase.h"
+#include "BindableCommon.h"
 #include "Vertex.h"
 #include "GraphicsThrowMacros.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+using namespace Bind;
 
 TestModel::TestModel(Graphics& gfx, std::mt19937& rng, 
 	std::uniform_real_distribution<float>& adist, 
@@ -21,8 +23,8 @@ TestModel::TestModel(Graphics& gfx, std::mt19937& rng,
 	if (!isStaticInitialized())
 	{
 
-		using hw3dexp::VertexLayout;
-		hw3dexp::VertexBuffer vbuf(std::move(
+		using Dvtx::VertexLayout;
+		Dvtx::VertexBuffer vbuf(std::move(
 			VertexLayout{}
 			.Append(VertexLayout::Position3D)
 			.Append(VertexLayout::Normal)

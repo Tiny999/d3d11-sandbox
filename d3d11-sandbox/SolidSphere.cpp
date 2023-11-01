@@ -1,11 +1,12 @@
 #include "SolidSphere.h"
-#include "BindableBase.h"
+#include "BindableCommon.h"
 #include "GraphicsThrowMacros.h"
 #include "Sphere.h"
 
 
 SolidSphere::SolidSphere(Graphics& gfx, float radius)
 {
+	using namespace Bind;
 	namespace dx = DirectX;
 
 	if (!isStaticInitialized())
@@ -30,7 +31,7 @@ SolidSphere::SolidSphere(Graphics& gfx, float radius)
 			dx::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
 			float padding;
 		} colorConst;
-		AddStaticBind(std::make_unique<PixelConstantBuffer<PSColorConstant>>(gfx, colorConst, 0));
+		AddStaticBind(std::make_unique<PixelConstantBuffer<PSColorConstant>>(gfx, colorConst));
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 		{

@@ -1,6 +1,9 @@
 #include "Topology.h"
 
-void Topology::Bind(Graphics& gfx) noexcept
+namespace Bind
 {
-	GetContext(gfx)->IASetPrimitiveTopology(type);
+	void Topology::Bind(Graphics& gfx) noexcept
+	{
+		GetContext(gfx)->IASetPrimitiveTopology(type);
+	}
 }
