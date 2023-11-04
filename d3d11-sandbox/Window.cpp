@@ -117,6 +117,18 @@ void Window::SetTitle(const std::string title)
 	}
 }
 
+void Window::EnableCursor()
+{
+	cursorEnabled = true;
+	ShowCursor();
+}
+
+void Window::DisableCursor()
+{
+	cursorEnabled = false;
+	HideCursor();
+}
+
 Graphics& Window::Gfx()
 {
 	return *pGfx;
@@ -307,6 +319,16 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 
 	return DefWindowProcA(hWnd, msg, wParam, lParam);
+}
+
+void Window::ShowCursor()
+{
+	while (::ShowCursor(TRUE) < 0);
+}
+
+void Window::HideCursor()
+{
+	while (::ShowCursor(FALSE) >= 0); 
 }
 
 Window::WinException::WinException(int line, const char* file, HRESULT hr) noexcept
