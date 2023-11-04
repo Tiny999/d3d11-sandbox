@@ -56,6 +56,8 @@ private:
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	void ShowCursor();
 	void HideCursor();
+	void EnableImguiMouse();
+	void DisableImguiMouse();
 public:
 	Keyboard kbd;
 	Mouse mouse;

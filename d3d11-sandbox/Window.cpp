@@ -121,12 +121,14 @@ void Window::EnableCursor()
 {
 	cursorEnabled = true;
 	ShowCursor();
+	EnableImguiMouse();
 }
 
 void Window::DisableCursor()
 {
 	cursorEnabled = false;
 	HideCursor();
+	DisableImguiMouse();
 }
 
 Graphics& Window::Gfx()
@@ -329,6 +331,16 @@ void Window::ShowCursor()
 void Window::HideCursor()
 {
 	while (::ShowCursor(FALSE) >= 0); 
+}
+
+void Window::EnableImguiMouse()
+{
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+}
+
+void Window::DisableImguiMouse()
+{
+	ImGui::GetIO().ConfigFlags |= ~ImGuiConfigFlags_NoMouse;
 }
 
 Window::WinException::WinException(int line, const char* file, HRESULT hr) noexcept
