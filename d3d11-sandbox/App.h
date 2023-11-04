@@ -24,6 +24,6 @@ private:
 	ChiliTimer timer;
 	PointLight light;
 	float speed_factor = 1.0f;
-	Model nano{ wnd.Gfx(), "models\\boxy.gltf" };
+	Model nano{ wnd.Gfx(), "models\\nano.gltf" };
 };
 
