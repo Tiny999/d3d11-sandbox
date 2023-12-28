@@ -54,10 +54,12 @@ private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-	void ShowCursor();
-	void HideCursor();
-	void EnableImguiMouse();
-	void DisableImguiMouse();
+	void ConfineCursor() noexcept;
+	void FreeCursor() noexcept;
+	void ShowCursor() noexcept;
+	void HideCursor() noexcept;
+	void EnableImguiMouse() noexcept;
+	void DisableImguiMouse() noexcept;
 public:
 	Keyboard kbd;
 	Mouse mouse;

@@ -122,6 +122,7 @@ void Window::EnableCursor()
 	cursorEnabled = true;
 	ShowCursor();
 	EnableImguiMouse();
+	FreeCursor();
 }
 
 void Window::DisableCursor()
@@ -129,6 +130,7 @@ void Window::DisableCursor()
 	cursorEnabled = false;
 	HideCursor();
 	DisableImguiMouse();
+	ConfineCursor();
 }
 
 Graphics& Window::Gfx()
@@ -260,6 +262,14 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	}
 	case WM_LBUTTONDOWN:
 	{
+		SetForegroundWindow(hWnd);
+
+		if (!cursorEnabled)
+		{
+			ConfineCursor();
+			HideCursor();
+		}
+
 		if (imio.WantCaptureMouse)
 		{
 			// If imgui capturing this message, don't pass on to window
@@ -318,27 +328,58 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		mouse.onWheelDelta(pt.x, pt.y, delta);
 	}
+	case WM_ACTIVATE:
+	{
+		OutputDebugString("Activate\n");
+
+		if (!cursorEnabled)
+		{
+			if (wParam & WA_ACTIVE)
+			{
+				OutputDebugString("Activate -> confine\n");
+				ConfineCursor();
+			}
+			else
+			{
+				OutputDebugString("Activate -> release\n");
+				FreeCursor();
+			}
+		}
+	}
 	}
 
 	return DefWindowProcA(hWnd, msg, wParam, lParam);
 }
 
-void Window::ShowCursor()
+void Window::ConfineCursor() noexcept
+{
+	RECT rect;
+	GetClientRect(hWnd, &rect);
+	MapWindowPoints(hWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+	ClipCursor(&rect);
+}
+
+void Window::FreeCursor() noexcept
+{
+	ClipCursor(nullptr);
+}
+
+void Window::ShowCursor() noexcept
 {
 	while (::ShowCursor(TRUE) < 0);
 }
 
-void Window::HideCursor()
+void Window::HideCursor() noexcept
 {
 	while (::ShowCursor(FALSE) >= 0); 
 }
 
-void Window::EnableImguiMouse()
+void Window::EnableImguiMouse() noexcept
 {
 	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 }
 
-void Window::DisableImguiMouse()
+void Window::DisableImguiMouse() noexcept
 {
 	ImGui::GetIO().ConfigFlags |= ~ImGuiConfigFlags_NoMouse;
 }
