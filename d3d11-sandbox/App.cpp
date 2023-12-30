@@ -106,7 +106,7 @@ void App::DoFrame()
 	{
 		if (!wnd.CursorEnabled())
 		{
-			camera.Rotate(delta->x, delta->y);
+			camera.Rotate((float)delta->x, (float)delta->y);
 		}
 	}
 
