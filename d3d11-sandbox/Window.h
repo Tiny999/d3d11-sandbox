@@ -49,6 +49,7 @@ public:
 	void SetTitle(const std::string title);
 	void EnableCursor();
 	void DisableCursor();
+	void CursorEnabled() const noexcept;
 	Graphics& Gfx();
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -66,8 +67,9 @@ public:
 private: 
 	int width;
 	int height;
+	bool cursorEnabled = true;
 	HWND hWnd;
 	std::unique_ptr<Graphics> pGfx;
-	bool cursorEnabled = false;
+	std::vector<BYTE> rawBuffer;
 };
 

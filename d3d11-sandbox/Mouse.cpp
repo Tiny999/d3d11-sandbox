@@ -6,6 +6,18 @@ std::pair<int, int> Mouse::GetPos() const noexcept
     return { x,y };
 }
 
+std::optional<Mouse::RawDelta> Mouse::ReadRawDelta() noexcept
+{
+    if (rawDeltaBuffer.empty())
+    {
+        return std::nullopt;
+    }
+
+    const RawDelta d = rawDeltaBuffer.front();
+    rawDeltaBuffer.pop();
+    return d;
+}
+
 int Mouse::GetPosX() const noexcept
 {
     return x;
@@ -68,6 +80,12 @@ void Mouse::onMouseEnter() noexcept
 {
     isInWindow = true;
     buffer.push(Mouse::Event(Mouse::Event::Type::Enter, *this));
+    TrimBuffer();
+}
+
+void Mouse::onRawDelta(int dx, int dy) noexcept
+{
+    rawDeltaBuffer.push({ dx, dy });
     TrimBuffer();
 }
 
@@ -136,5 +154,13 @@ void Mouse::TrimBuffer() noexcept
     while (buffer.size() > 0u)
     {
         buffer.pop();
+    }
+}
+
+void Mouse::TrimRawInputBuffer() noexcept
+{
+    while (rawDeltaBuffer.size() > bufferSize)
+    {
+        rawDeltaBuffer.pop();
     }
 }
