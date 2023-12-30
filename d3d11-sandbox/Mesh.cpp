@@ -219,7 +219,7 @@ Model::Model(Graphics& gfx, const std::string fileName)
 
 	for (size_t i = 0; i < pScene->mNumMeshes; i++)
 	{
-		meshPtrs.push_back(ParseMesh(gfx, *pScene->mMeshes[i]));
+		meshPtrs.push_back(ParseMesh(gfx, *pScene->mMeshes[i], pScene->mMaterials));
 	}
 
 	int nextID = 0;
@@ -240,7 +240,7 @@ void Model::Draw(Graphics& gfx) const
 	}
 	pRoot->Draw(gfx, dx::XMMatrixIdentity());
 }
-std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh)
+std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 {
 	namespace dx = DirectX;
 	using Dvtx::VertexLayout;
@@ -250,6 +250,8 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh)
 		.Append(VertexLayout::Position3D)
 		.Append(VertexLayout::Normal)
 	));
+
+	auto& material = *pMaterials[mesh.mMaterialIndex];
 
 	for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 	{
