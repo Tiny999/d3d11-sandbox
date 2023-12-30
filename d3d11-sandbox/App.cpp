@@ -46,6 +46,24 @@ void App::DoFrame()
 	// draw light
 	light.Draw(wnd.Gfx());
 
+
+	while (const auto e = wnd.kbd.ReadKey())
+	{
+		if (e->IsPress() && e->GetCode() == VK_INSERT)
+		{
+			if (wnd.CursorEnabled())
+			{
+				wnd.DisableCursor();
+				wnd.mouse.EnableRaw();
+			}
+			else
+			{
+				wnd.EnableCursor();
+				wnd.mouse.DisableRaw();
+			}
+		}
+	}
+
 	// imgui windows
 	camera.SpawnControlWindow();
 	light.SpawnControlWindow();
@@ -73,12 +91,13 @@ void App::ShowRawInputWindow()
 	{
 		x += d->x;
 		y += d->y;
-
-		if (ImGui::Begin("Raw Input"))
-		{
-			ImGui::Text("Tally: (%d, %d)", x, y);
-		}
-
-		ImGui::End();
 	}
+
+	if (ImGui::Begin("Raw Input"))
+	{
+		ImGui::Text("Tally: (%d, %d)", x, y);
+		ImGui::Text("Cursor %s", wnd.CursorEnabled() ? "enabled" : "disabled");
+	}
+
+	ImGui::End();
 }

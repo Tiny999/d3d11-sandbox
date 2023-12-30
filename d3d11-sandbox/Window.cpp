@@ -148,6 +148,11 @@ void Window::DisableCursor()
 	ConfineCursor();
 }
 
+bool Window::CursorEnabled() const noexcept
+{
+	return cursorEnabled;
+}
+
 Graphics& Window::Gfx()
 {
 	return *pGfx;
@@ -348,6 +353,11 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 	case WM_INPUT:
 	{
+		if (!mouse.RawEnabled())
+		{
+			break;
+		}
+
 		UINT size;
 
 		// first get size of input data
@@ -395,18 +405,15 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 	case WM_ACTIVATE:
 	{
-		OutputDebugString("Activate\n");
 
 		if (!cursorEnabled)
 		{
 			if (wParam & WA_ACTIVE)
 			{
-				OutputDebugString("Activate -> confine\n");
 				ConfineCursor();
 			}
 			else
 			{
-				OutputDebugString("Activate -> release\n");
 				FreeCursor();
 			}
 		}

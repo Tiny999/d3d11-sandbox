@@ -104,6 +104,9 @@ public:
 		return buffer.empty();
 	}
 	void Flush() noexcept;
+	void EnableRaw() noexcept;
+	void DisableRaw() noexcept;
+	bool RawEnabled() const noexcept;
 private:
 	void OnMouseMove(int newX, int newY) noexcept;
 	void onMouseLeave() noexcept;
@@ -122,6 +125,7 @@ private:
 	bool leftIsPressed = false;
 	bool rightIsPressed = false;
 	bool isInWindow = false;
+	bool rawEnabled = false;
 	int x, y;
 	int wheelDeltaCarry = 0;
 	static constexpr unsigned int bufferSize = 16u;

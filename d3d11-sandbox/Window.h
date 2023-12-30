@@ -49,7 +49,7 @@ public:
 	void SetTitle(const std::string title);
 	void EnableCursor();
 	void DisableCursor();
-	void CursorEnabled() const noexcept;
+	bool CursorEnabled() const noexcept;
 	Graphics& Gfx();
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
