@@ -249,6 +249,7 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 		VertexLayout{}
 		.Append(VertexLayout::Position3D)
 		.Append(VertexLayout::Normal)
+		.Append(VertexLayout::Texture2D)
 	));
 
 	auto& material = *pMaterials[mesh.mMaterialIndex];
@@ -257,7 +258,8 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 	{
 		vbuf.EmplaceBack(
 			*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
-			*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i])
+			*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
+			*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
 		);
 	}
 
@@ -272,7 +274,26 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 		indices.push_back(face.mIndices[2]);
 	}
 
+
 	std::vector<std::unique_ptr<Bind::Bindable>> bindablePtrs;
+
+	if (mesh.mMaterialIndex >= 0)
+	{
+		// If mesh has material (no material will yeild -ve number)
+
+		using namespace std::string_literals;
+		auto& material = *pMaterials[mesh.mMaterialIndex];
+
+		aiString texFileName;
+		material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+
+		bindablePtrs.push_back(std::make_unique<Bind::Texture>(gfx, Surface::FromFile("models\\nanosuit\\"s + texFileName.C_Str())));
+
+		bindablePtrs.push_back(std::make_unique<Bind::Sampler>(gfx));
+
+
+	}
+
 
 	bindablePtrs.push_back(std::make_unique<Bind::VertexBuffer>(gfx, vbuf));
 

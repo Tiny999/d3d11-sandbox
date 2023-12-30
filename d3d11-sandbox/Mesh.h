@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 #include <optional>
 #include "ConditionalNoexcept.h"
+#include "Surface.h"
 
 class ModelException : public Exception
 {
