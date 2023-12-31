@@ -277,17 +277,26 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 
 	std::vector<std::unique_ptr<Bind::Bindable>> bindablePtrs;
 
+	bool hasSpecular = false;
 	if (mesh.mMaterialIndex >= 0)
 	{
 		// If mesh has material (no material will yeild -ve number)
 
 		using namespace std::string_literals;
+		const auto base = "models\\nanosuit\\"s;
 		auto& material = *pMaterials[mesh.mMaterialIndex];
 
 		aiString texFileName;
-		material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
 
-		bindablePtrs.push_back(std::make_unique<Bind::Texture>(gfx, Surface::FromFile("models\\nanosuit\\"s + texFileName.C_Str())));
+		material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+		bindablePtrs.push_back(std::make_unique<Bind::Texture>(gfx, Surface::FromFile(base + texFileName.C_Str())));
+
+		if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
+		{
+			bindablePtrs.push_back(std::make_unique<Bind::Texture>(gfx, Surface::FromFile(base + texFileName.C_Str()), 1u));
+			hasSpecular = true;
+		}
+
 
 		bindablePtrs.push_back(std::make_unique<Bind::Sampler>(gfx));
 
@@ -303,17 +312,26 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 	auto pvsbc = pvs->GetBytecode();
 	bindablePtrs.push_back(std::move(pvs));
 
-	bindablePtrs.push_back(std::make_unique<Bind::PixelShader>(gfx, L"PhongPS.cso"));
+	if (hasSpecular)
+	{
+		bindablePtrs.push_back(std::make_unique<Bind::PixelShader>(gfx, L"PhongPSSpecMap.cso"));
+	}
+	else
+	{
+		bindablePtrs.push_back(std::make_unique<Bind::PixelShader>(gfx, L"PhongPS.cso"));
+
+		struct PSMaterialConstant
+		{
+			float specularIntensity = 0.8f;
+			float specularPower = 40.0f;
+			float padding[2];
+		} pmc;
+		bindablePtrs.push_back(std::make_unique<Bind::PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+	}
 
 	bindablePtrs.push_back(std::make_unique<Bind::InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), pvsbc));
 
-	struct PSMaterialConstant
-	{
-		float specularIntensity = 0.6f;
-		float specularPower = 30.0f;
-		float padding[2];
-	} pmc;
-	bindablePtrs.push_back(std::make_unique<Bind::PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+	
 
 	return std::make_unique<Mesh>(gfx, std::move(bindablePtrs));
 }

@@ -1,4 +1,5 @@
 Texture2D tex;
+Texture2D spec;
 SamplerState samplr;
 
 cbuffer LightCBuf
@@ -12,19 +13,13 @@ cbuffer LightCBuf
     float attQuad;
 };
 
-cbuffer ObjectCBuf
-{
-    float specularIntensity;
-    float specularPower;
-    float padding[2];
-};
 
 float4 main(float3 worldPos : Position, float3 n : Normal, float2 texCoord : Texcoord) : SV_TARGET
 {
     // fragment to light vector data 
     const float3 vToL = lightPos - worldPos;
     const float distToL = length(vToL);
-    const float3 dirToL = vToL / distToL;  
+    const float3 dirToL = vToL / distToL;
     
     // diffuse attenuation
     const float att = 1.0f / (attConst + attLin * distToL + attQuad * (distToL * distToL));
@@ -37,8 +32,11 @@ float4 main(float3 worldPos : Position, float3 n : Normal, float2 texCoord : Tex
     const float3 r = w * 2.0f - vToL;
     
     // calculate specular intensity based on angle between viewing vector and normal
-    const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
+    float4 specularSample = spec.Sample(samplr, texCoord);
+    const float3 specularColorIntensity = specularSample.rgb;
+    const float specularPower = pow(2.0f, specularSample.a * 13.f);
+    const float3 specular = att * specularColorIntensity * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
         
     // final color 
-    return float4(saturate((diffuse + ambient) * tex.Sample(samplr, texCoord).rgb + specular), 1.0f);
+    return float4(saturate(diffuse + ambient + specular), 1.0f) * tex.Sample(samplr, texCoord);
 }
