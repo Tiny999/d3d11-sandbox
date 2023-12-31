@@ -33,10 +33,10 @@ float4 main(float3 worldPos : Position, float3 n : Normal, float2 texCoord : Tex
     
     // calculate specular intensity based on angle between viewing vector and normal
     float4 specularSample = spec.Sample(samplr, texCoord);
-    const float3 specularColorIntensity = specularSample.rgb;
+    const float3 specularReflectionColor = specularSample.rgb;
     const float specularPower = pow(2.0f, specularSample.a * 13.f);
-    const float3 specular = att * specularColorIntensity * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
+    const float3 specular = att * (diffuseColor * diffuseIntensity) * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
         
     // final color 
-    return float4(saturate(diffuse + ambient + specular), 1.0f) * tex.Sample(samplr, texCoord);
+    return float4(saturate((diffuse + ambient) * tex.Sample(samplr, texCoord).rgb + specular * specularReflectionColor), 1.0f);
 }
