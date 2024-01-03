@@ -193,7 +193,6 @@
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Sampler.cpp" />
-    <ClCompile Include="Sheet.cpp" />
     <ClCompile Include="SolidSphere.cpp" />
     <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -221,6 +220,7 @@
     <ClInclude Include="GDIPlusManager.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="GraphicsThrowMacros.h" />
+    <ClInclude Include="BindableCodex.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="ImGuiManager.h" />
@@ -243,7 +243,6 @@
     <ClInclude Include="Prism.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sampler.h" />
-    <ClInclude Include="Sheet.h" />
     <ClInclude Include="SolidSphere.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
