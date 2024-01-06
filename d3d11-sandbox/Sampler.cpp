@@ -1,4 +1,5 @@
 #include "Sampler.h"
+#include "BindableCodex.h"
 
 namespace Bind {
 
@@ -20,5 +21,17 @@ namespace Bind {
 	void Sampler::Bind(Graphics& gfx) noexcept
 	{
 		GetContext(gfx)->PSSetSamplers(0, 1, pSampler.GetAddressOf());
+	}
+	std::shared_ptr<Bindable> Sampler::Resolve(Graphics& gfx)
+	{
+		return Codex::Resolve<Sampler>(gfx);
+	}
+	std::string Sampler::GenerateUID()
+	{
+		return typeid(Sampler).name();
+	}
+	std::string Sampler::GetUID() const noexcept
+	{
+		return GenerateUID();
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics.h"
 #include "GraphicsThrowMacros.h"
+#include <memory>
 
 namespace Bind
 {
