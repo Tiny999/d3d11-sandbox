@@ -7,8 +7,9 @@ namespace Bind
 		const UINT offset = 0u;
 		GetContext(gfx)->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 	}
-	std::shared_ptr<Bindable> VertexBuffer::Resolve(Graphics& gfx, const std::string& tag, const Dvtx::VertexBuffer& vbuf)
+	std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, const std::string& tag, const Dvtx::VertexBuffer& vbuf)
 	{
+		assert(tag != "?");
 		return Codex::Resolve<VertexBuffer>(gfx, tag, vbuf);
 	}
 	std::string VertexBuffer::GetUID() const noexcept

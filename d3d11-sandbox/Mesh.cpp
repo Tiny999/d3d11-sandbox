@@ -233,6 +233,7 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 {
 	namespace dx = DirectX;
 	using Dvtx::VertexLayout;
+	using namespace Bind;
 
 	Dvtx::VertexBuffer vbuf(std::move(
 		VertexLayout{}
@@ -264,26 +265,26 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 	}
 
 
-	std::vector<std::shared_ptr<Bind::Bindable>> bindablePtrs;
+	std::vector<std::shared_ptr<Bindable>> bindablePtrs;
+
+	using namespace std::string_literals;
+	const auto base = "models\\nanosuit\\"s;
 
 	bool hasSpecular = false;
 	float shininess = 35.f;
 	if (mesh.mMaterialIndex >= 0)
 	{
 		// If mesh has material (no material will yeild -ve number)
-
-		using namespace std::string_literals;
-		const auto base = "models\\nanosuit\\"s;
 		auto& material = *pMaterials[mesh.mMaterialIndex];
 
 		aiString texFileName;
 
 		material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		bindablePtrs.push_back(std::make_shared<Bind::Texture>(gfx, base + texFileName.C_Str()));
+		bindablePtrs.push_back(Texture::Resolve(gfx, base + texFileName.C_Str()));
 
 		if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
 		{
-			bindablePtrs.push_back(std::make_shared<Bind::Texture>(gfx,base + texFileName.C_Str(), 1u));
+			bindablePtrs.push_back(Texture::Resolve(gfx,base + texFileName.C_Str(), 1u));
 			hasSpecular = true;
 		}
 		else
@@ -292,27 +293,28 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 		}
 
 
-		bindablePtrs.push_back(std::make_shared<Bind::Sampler>(gfx));
+		bindablePtrs.push_back(Sampler::Resolve(gfx));
 
 
 	}
 
+	auto meshTag = base + "%"s + mesh.mName.C_Str();
 
-	bindablePtrs.push_back(std::make_shared<Bind::VertexBuffer>(gfx, vbuf));
+	bindablePtrs.push_back(VertexBuffer::Resolve(gfx, meshTag, vbuf));
 
-	bindablePtrs.push_back(std::make_shared<Bind::IndexBuffer>(gfx, indices));
+	bindablePtrs.push_back(IndexBuffer::Resolve(gfx, meshTag, indices));
 
-	auto pvs = std::make_shared<Bind::VertexShader>(gfx, "PhongVS.cso");
-	auto pvsbc = pvs->GetBytecode();
+	auto pvs = VertexShader::Resolve(gfx, "PhongVS.cso");
+	auto pvsbc = static_cast<VertexShader&>(*pvs).GetBytecode();
 	bindablePtrs.push_back(std::move(pvs));
 
 	if (hasSpecular)
 	{
-		bindablePtrs.push_back(std::make_shared<Bind::PixelShader>(gfx, "PhongPSSpecMap.cso"));
+		bindablePtrs.push_back(PixelShader::Resolve(gfx, "PhongPSSpecMap.cso"));
 	}
 	else
 	{
-		bindablePtrs.push_back(std::make_shared<Bind::PixelShader>(gfx, "PhongPS.cso"));
+		bindablePtrs.push_back(PixelShader::Resolve(gfx, "PhongPS.cso"));
 
 		struct PSMaterialConstant
 		{
@@ -321,10 +323,12 @@ std::unique_ptr<Mesh> Model::ParseMesh(Graphics& gfx, const aiMesh& mesh, const 
 			float padding[2];
 		} pmc;
 		pmc.specularPower = shininess;
-		bindablePtrs.push_back(std::make_shared<Bind::PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u));
+
+		// Issue here. Fix later
+		bindablePtrs.push_back(PixelConstantBuffer<PSMaterialConstant>::Resolve(gfx, pmc, 1u));
 	}
 
-	bindablePtrs.push_back(std::make_shared<Bind::InputLayout>(gfx, vbuf.GetLayout(), pvsbc));
+	bindablePtrs.push_back(InputLayout::Resolve(gfx, vbuf.GetLayout(), pvsbc));
 
 	
 

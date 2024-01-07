@@ -36,8 +36,9 @@ namespace Bind
 	{
 		return count;
 	}
-	std::shared_ptr<Bindable> IndexBuffer::Resolve(Graphics& gfx, const std::string& tag, const std::vector<unsigned short>& indices)
+	std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(Graphics& gfx, const std::string& tag, const std::vector<unsigned short>& indices)
 	{
+		assert(tag != "?");
 		return Codex::Resolve<IndexBuffer>(gfx, tag, indices);
 	}
 	std::string IndexBuffer::GetUID() const noexcept
