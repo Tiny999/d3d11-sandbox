@@ -10,11 +10,13 @@
 
 GDIPlusManager gdipm;
 
-App::App()  
+App::App()
 	:
 	wnd(1280, 720, "Direct3d11 Sandbox"),
-	light(wnd.Gfx())
+	light(wnd.Gfx()),
+	plane(wnd.Gfx(), 3.f)
 {
+	plane.SetPos({ 1.0f, 17.0f, -1.0f });
 	wnd.Gfx().SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }
 
@@ -42,6 +44,7 @@ void App::DoFrame()
 
 
 	nano.Draw(wnd.Gfx());
+	plane.Draw(wnd.Gfx());
 	// draw light
 	light.Draw(wnd.Gfx());
 
