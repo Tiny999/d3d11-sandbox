@@ -115,6 +115,7 @@ void App::DoFrame()
 	// imgui windows
 	camera.SpawnControlWindow();
 	light.SpawnControlWindow();
+	plane.SpawnControlWindow(wnd.Gfx());
 	nano.ShowWindow("nanosuit");
 
 
