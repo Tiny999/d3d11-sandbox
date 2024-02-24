@@ -1,17 +1,17 @@
-#include "TestPlane.h"
-#include "Plane.h"
+#include "TestCube.h"
+#include "Cube.h"
 #include "BindableCommon.h"
 #include "imgui/imgui.h"
 
-TestPlane::TestPlane(Graphics& gfx, float size)
+TestCube::TestCube(Graphics& gfx, float size)
 {
 	using namespace Bind;
 	namespace dx = DirectX;
 
-	auto model = Plane::Make();
-	model.Transform(dx::XMMatrixScaling(size, size, 1.0f));
-	const auto geometryTag = "$plane." + std::to_string(size);
-
+	auto model = Cube::MakeIndependentTextured();
+	model.Transform(dx::XMMatrixScaling(size, size, size));
+	model.SetNormalsIndependentFlat();
+	const auto geometryTag = "$cube." + std::to_string(size);
 	AddBind(VertexBuffer::Resolve(gfx, geometryTag, model.vertices));
 	AddBind(IndexBuffer::Resolve(gfx, geometryTag, model.indices));
 
@@ -19,40 +19,41 @@ TestPlane::TestPlane(Graphics& gfx, float size)
 	AddBind(Texture::Resolve(gfx, "images\\brickwall_normal.jpg", 1u));
 
 	auto pvs = VertexShader::Resolve(gfx, "PhongVS.cso");
-	auto pvsbv = pvs->GetBytecode();
+	auto pvsbc = pvs->GetBytecode();
 	AddBind(std::move(pvs));
 
 	AddBind(PixelShader::Resolve(gfx, "PhongPSNormalMap.cso"));
 
-	AddBind(PixelConstantBuffer<PMaterialConst>::Resolve(gfx, pmc, 1u));
-	
-	AddBind(InputLayout::Resolve(gfx, model.vertices.GetLayout(), pvsbv));
+	AddBind(PixelConstantBuffer<PSMaterialConstant>::Resolve(gfx, pmc, 1u));
 
-	AddBind(Topology::Resolve(gfx, D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+	AddBind(InputLayout::Resolve(gfx, model.vertices.GetLayout(), pvsbc));
 
-	AddBind(std::make_shared<TransformCbuf>(gfx, *this));
+	AddBind(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+
+	AddBind(std::make_shared<TransformCBufDouble>(gfx, *this, 0u, 2u));
 }
 
-void TestPlane::SetPos(DirectX::XMFLOAT3 pos) noexcept
+void TestCube::SetPos(DirectX::XMFLOAT3 pos) noexcept
 {
 	this->pos = pos;
 }
 
-void TestPlane::SetRotation(float roll, float pitch, float yaw) noexcept
+void TestCube::SetRotation(float roll, float pitch, float yaw) noexcept
 {
 	this->roll = roll;
 	this->pitch = pitch;
 	this->yaw = yaw;
 }
 
-DirectX::XMMATRIX TestPlane::GetTransformXM() const noexcept
+DirectX::XMMATRIX TestCube::GetTransformXM() const noexcept
 {
-	return DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) * DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+	return DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw) *
+		DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
 }
 
-void TestPlane::SpawnControlWindow(Graphics& gfx) noexcept
+void TestCube::SpawnControlWindow(Graphics& gfx) noexcept
 {
-	if (ImGui::Begin("Plane"))
+	if (ImGui::Begin("Cube"))
 	{
 		ImGui::Text("Position");
 		ImGui::SliderFloat("X", &pos.x, -80.0f, 80.0f, "%.1f");
@@ -70,7 +71,7 @@ void TestPlane::SpawnControlWindow(Graphics& gfx) noexcept
 		pmc.normalMappingEnabled = checkState ? TRUE : FALSE;
 		if (changed0 || changed1 || changed2)
 		{
-			QueryBindable<Bind::PixelConstantBuffer<PMaterialConst>>()->Update(gfx, pmc);
+			QueryBindable<Bind::PixelConstantBuffer<PSMaterialConstant>>()->Update(gfx, pmc);
 		}
 	}
 	ImGui::End();

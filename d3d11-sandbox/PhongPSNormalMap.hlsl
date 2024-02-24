@@ -17,28 +17,32 @@ cbuffer ObjectCBuf
     float padding[1];
 };
 
-cbuffer TransformCbuf
-{
-    matrix modelView;
-    matrix modelViewProjection;
-};
-
 Texture2D tex;
-Texture2D nmap;
+Texture2D nmap : register(t2);
 
 SamplerState splr;
 
 
-float4 main(float3 worldPos : Position, float3 n : Normal, float2 tc : Texcoord) : SV_TARGET
+float4 main(float3 worldPos : Position, float3 n : Normal, float3 tan: Tangent, float3 bitan: Bitangent, float2 tc : Texcoord) : SV_TARGET
 {
     // sample from normal map if enabled
     if(normalMapEnabled)
     {
+        // build matrix to transform (rotate) from tangent space
+        const float3x3 tanToView = float3x3(
+            normalize(tan),
+            normalize(bitan),
+            normalize(n)
+        );
+        
+        // unpack normal from normal map into tangent space
         const float3 normalSample = nmap.Sample(splr, tc).xyz;
         n.x = normalSample.x * 2.f - 1.0f;
         n.y = -normalSample.y * 2.f + 1.0f;
-        n.z = -normalSample.z;
-        n = mul(n, (float3x3)modelView);
+        n.z = normalSample.z;
+        
+        // bring normal into view space using matrix
+        n = mul(n, tanToView);
     }
     
     
